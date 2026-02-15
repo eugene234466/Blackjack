@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackjack Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .player-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .chips {
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .bet-info {
+            color: #4ade80;
+            font-weight: bold;
+        }
+
+        .cards-area {
+            min-height: 200px;
+            background: rgba(0, 100, 0, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            width: 80px;
+            height: 112px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: dealCard 0.3s ease-out;
+        }
+
+        @keyframes dealCard {
+            from {
+                transform: translateY(-100px) rotate(10deg);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) rotate(0);
+                opacity: 1;
+            }
+        }
+
+        .card.red {
+            color: #dc2626;
+        }
+
+        .card.black {
+            color: #1f2937;
+        }
+
+        .card-top {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .card-middle {
+            font-size: 2em;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .card-bottom {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: right;
+            transform: rotate(180deg);
+        }
+
+        .game-info {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .sum-display {
+            font-size: 1.8em;
+            margin: 10px 0;
+            color: #ffd700;
+        }
+
+        .message {
+            font-size: 1.4em;
+            margin: 15px 0;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .betting-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .betting-section h3 {
+            margin-bottom: 15px;
+            color: #ffd700;
+        }
+
+        .bet-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        button {
+            background: linear-gradient(145deg, #ffd700, #ffed4e);
+            color: #1e3c72;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(145deg, #ffed4e, #ffd700);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .game-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .game-buttons button {
+            background: linear-gradient(145deg, #4ade80, #22c55e);
+        }
+
+        .game-buttons button:hover {
+            background: linear-gradient(145deg, #22c55e, #4ade80);
+        }
+
+        .reset-button {
+            background: linear-gradient(145deg, #ef4444, #dc2626) !important;
+        }
+
+        .reset-button:hover {
+            background: linear-gradient(145deg, #dc2626, #ef4444) !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>♠ BLACKJACK ♥</h1>
+        </div>
+
+        <div class="player-info">
+            <div id="player-name">Per</div>
+            <div class="chips" id="chips">Chips: $145</div>
+            <div class="bet-info" id="bet-display">Bet: $0</div>
+        </div>
+
+        <div class="betting-section">
+            <h3>Place Your Bet</h3>
+            <div class="bet-buttons">
+                <button onclick="bet10()">$10</button>
+                <button onclick="bet25()">$25</button>
+                <button onclick="bet50()">$50</button>
+                <button onclick="bet100()">$100</button>
+                <button onclick="betAll()">ALL IN</button>
+            </div>
+        </div>
+
+        <div class="cards-area" id="cards-area">
+            <div style="color: rgba(255,255,255,0.5); font-size: 1.2em;">Place your bet to start!</div>
+        </div>
+
+        <div class="game-info">
+            <div class="sum-display" id="sum-el">Sum: 0</div>
+            <div class="message" id="message">Welcome to Blackjack!</div>
+        </div>
+
+        <div class="game-buttons">
+            <button onclick="startGame()" id="start-btn">START GAME</button>
+            <button onclick="newCard()" id="hit-btn">HIT</button>
+            <button onclick="stand()" id="stand-btn">STAND</button>
+            <button onclick="resetGame()" class="reset-button">NEW ROUND</button>
+        </div>
+    </div>
+
+    <script>
+        let player = {
+            name: "Per",
+            chips: 145
+        }
+
+        let cards = []
+        let sum = 0
+        let hasBlackJack = false
+        let isAlive = false
+        let bet = 0
+        let gameInProgress = false
+
+        const suits = ['♠', '♥', '♦', '♣']
+        const suitColors = {'♠': 'black', '♥': 'red', '♦': 'red', '♣': 'black'}
+
+        function getRandomCard() {
+            let random = Math.floor(Math.random() * 13) + 1
+            let suit = suits[Math.floor(Math.random() * suits.length)]
+            let value = random
+            let display = random
+
+            if (random > 10) {
+                value = 10
+                if (random === 11) display = 'J'
+                else if (random === 12) display = 'Q'
+                else if (random === 13) display = 'K'
+            } else if (random === 1) {
+                value = 11
+                display = 'A'
+            }
+
+            return {value: value, display: display, suit: suit}
+        }
+
+        function updateDisplay() {
+            document.getElementById('chips').textContent = 'Chips: $' + player.chips
+            document.getElementById('bet-display').textContent = 'Bet: $' + bet
+            document.getElementById('sum-el').textContent = 'Sum: ' + sum
+        }
+
+        function renderCards() {
+            let cardsArea = document.getElementById('cards-area')
+            cardsArea.innerHTML = ''
+            
+            cards.forEach(card => {
+                let cardDiv = document.createElement('div')
+                cardDiv.className = 'card ' + suitColors[card.suit]
+                cardDiv.innerHTML = `
+                    <div class="card-top">${card.display}<br>${card.suit}</div>
+                    <div class="card-middle">${card.suit}</div>
+                    <div class="card-bottom">${card.display}<br>${card.suit}</div>
+                `
+                cardsArea.appendChild(cardDiv)
+            })
+        }
+
+        function placeBet(amount) {
+            if (gameInProgress) {
+                document.getElementById('message').textContent = "Finish the current game first!"
+                return
+            }
+            
+            if (amount > player.chips) {
+                document.getElementById('message').textContent = "Not enough chips!"
+                return
+            }
+            
+            if (amount <= 0) {
+                document.getElementById('message').textContent = "Bet must be greater than 0!"
+                return
+            }
+            
+            bet = amount
+            player.chips -= bet
+            updateDisplay()
+            document.getElementById('message').textContent = "Bet placed! Click 'START GAME' to begin."
+        }
+
+        function startGame() {
+            if (bet === 0) {
+                document.getElementById('message').textContent = "Please place a bet first!"
+                return
+            }
+            
+            if (gameInProgress) {
+                return
+            }
+            
+            isAlive = true
+            hasBlackJack = false
+            gameInProgress = true
+            
+            let firstCard = getRandomCard()
+            let secondCard = getRandomCard()
+            cards = [firstCard, secondCard]
+            sum = firstCard.value + secondCard.value
+
+            renderGame()
+        }
+
+        function renderGame() {
+            renderCards()
+            updateDisplay()
+            
+            if (sum < 21) {
+                document.getElementById('message').textContent = "Do you want to HIT or STAND?"
+            } else if (sum === 21) {
+                document.getElementById('message').textContent = "🎉 BLACKJACK! 🎉"
+                hasBlackJack = true
+                gameOver(true)
+            } else {
+                document.getElementById('message').textContent = "BUST! You lose $" + bet
+                isAlive = false
+                gameOver(false)
+            }
+        }
+
+        function newCard() {
+            if (isAlive === true && hasBlackJack === false && gameInProgress) {
+                let card = getRandomCard()
+                sum += card.value
+                cards.push(card)
+                renderGame()
+            }    
+        }
+
+        function stand() {
+            if (gameInProgress && isAlive && !hasBlackJack) {
+                if (sum >= 17) {
+                    // Player wins by standing on 17-20
+                    document.getElementById('message').textContent = "You stood on " + sum + ". You win $" + (bet * 2) + "!"
+                    gameOver(true)
+                } else {
+                    // Standing on less than 17 means dealer would likely win
+                    document.getElementById('message').textContent = "You stood on " + sum + ". Too low! You lose."
+                    gameOver(false)
+                }
+            }
+        }
+
+        function gameOver(won) {
+            gameInProgress = false
+            
+            if (won) {
+                let winnings = bet * 2
+                player.chips += winnings
+                console.log("You won $" + winnings)
+            }
+            
+            updateDisplay()
+            
+            if (player.chips === 0) {
+                document.getElementById('message').textContent += " You're out of chips! GAME OVER!"
+            }
+        }
+
+        function resetGame() {
+            if (player.chips === 0) {
+                player.chips = 145
+            }
+            
+            cards = []
+            sum = 0
+            hasBlackJack = false
+            isAlive = false
+            bet = 0
+            gameInProgress = false
+            
+            document.getElementById('cards-area').innerHTML = '<div style="color: rgba(255,255,255,0.5); font-size: 1.2em;">Place your bet to start!</div>'
+            document.getElementById('message').textContent = "Place your bet to start a new round!"
+            document.getElementById('sum-el').textContent = "Sum: 0"
+            updateDisplay()
+        }
+
+        function bet10() { placeBet(10) }
+        function bet25() { placeBet(25) }
+        function bet50() { placeBet(50) }
+        function bet100() { placeBet(100) }
+        function betAll() { placeBet(player.chips) }
+    </script>
+</body>
+</html>
