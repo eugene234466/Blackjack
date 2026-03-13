@@ -26,7 +26,7 @@
             background: rgba(0, 0, 0, 0.4);
             border-radius: 20px;
             padding: 20px;
-            max-width: 900px;
+            max-width: 1100px;
             width: 100%;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
         }
@@ -70,17 +70,65 @@
             font-weight: bold;
         }
 
-        .cards-area {
-            min-height: 150px;
-            background: rgba(0, 100, 0, 0.3);
+        /* Dealer Section */
+        .dealer-section {
+            background: rgba(139, 0, 0, 0.3);
             border-radius: 15px;
-            padding: 20px 10px;
-            margin: 15px 0;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .dealer-header {
+            text-align: center;
+            font-size: clamp(1.1em, 3.5vw, 1.5em);
+            color: #ffd700;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .dealer-cards {
+            min-height: 120px;
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             justify-content: center;
             align-items: center;
+            padding: 10px;
+        }
+
+        .dealer-sum {
+            text-align: center;
+            font-size: clamp(1em, 3vw, 1.3em);
+            color: #ffd700;
+            margin-top: 10px;
+        }
+
+        /* Player Section */
+        .player-section {
+            background: rgba(0, 100, 0, 0.3);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 2px solid rgba(74, 222, 128, 0.3);
+        }
+
+        .player-header {
+            text-align: center;
+            font-size: clamp(1.1em, 3.5vw, 1.5em);
+            color: #4ade80;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .cards-area {
+            min-height: 120px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
         }
 
         .card {
@@ -95,6 +143,15 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             position: relative;
             animation: dealCard 0.3s ease-out;
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: clamp(1.5em, 4vw, 2em);
         }
 
         @keyframes dealCard {
@@ -145,7 +202,7 @@
         .sum-display {
             font-size: clamp(1.3em, 4vw, 1.8em);
             margin: 10px 0;
-            color: #ffd700;
+            color: #4ade80;
         }
 
         .message {
@@ -222,7 +279,6 @@
             background: linear-gradient(145deg, #ef4444, #dc2626) !important;
         }
 
-        /* Tablet styles */
         @media (min-width: 600px) {
             .game-container {
                 padding: 25px;
@@ -235,14 +291,8 @@
             .game-buttons {
                 grid-template-columns: repeat(4, 1fr);
             }
-
-            .cards-area {
-                min-height: 180px;
-                padding: 25px 15px;
-            }
         }
 
-        /* Desktop styles */
         @media (min-width: 900px) {
             .game-container {
                 padding: 30px;
@@ -264,14 +314,8 @@
             button:active {
                 transform: translateY(0);
             }
-
-            .cards-area {
-                min-height: 200px;
-                padding: 30px;
-            }
         }
 
-        /* Small mobile optimization */
         @media (max-width: 360px) {
             .game-container {
                 padding: 15px;
@@ -290,7 +334,6 @@
             }
         }
 
-        /* Landscape mobile */
         @media (max-height: 600px) and (orientation: landscape) {
             body {
                 align-items: flex-start;
@@ -303,11 +346,6 @@
 
             .header {
                 margin-bottom: 10px;
-            }
-
-            .cards-area {
-                min-height: 100px;
-                padding: 15px 10px;
             }
 
             .message {
@@ -340,12 +378,25 @@
             </div>
         </div>
 
-        <div class="cards-area" id="cards-area">
-            <div style="color: rgba(255,255,255,0.5); font-size: clamp(1em, 3vw, 1.2em);">Place your bet to start!</div>
+        <!-- Dealer Section -->
+        <div class="dealer-section">
+            <div class="dealer-header">🎩 DEALER</div>
+            <div class="dealer-cards" id="dealer-cards">
+                <div style="color: rgba(255,255,255,0.5); font-size: clamp(0.9em, 2.5vw, 1.1em);">Waiting...</div>
+            </div>
+            <div class="dealer-sum" id="dealer-sum">Sum: ?</div>
+        </div>
+
+        <!-- Player Section -->
+        <div class="player-section">
+            <div class="player-header">👤 YOU</div>
+            <div class="cards-area" id="cards-area">
+                <div style="color: rgba(255,255,255,0.5); font-size: clamp(0.9em, 2.5vw, 1.1em);">Place your bet to start!</div>
+            </div>
+            <div class="sum-display" id="sum-el">Sum: 0</div>
         </div>
 
         <div class="game-info">
-            <div class="sum-display" id="sum-el">Sum: 0</div>
             <div class="message" id="message">Welcome to Blackjack!</div>
         </div>
 
@@ -364,11 +415,14 @@
         }
 
         let cards = []
+        let dealerCards = []
         let sum = 0
+        let dealerSum = 0
         let hasBlackJack = false
         let isAlive = false
         let bet = 0
         let gameInProgress = false
+        let dealerHiddenCard = null
 
         const suits = ['♠', '♥', '♦', '♣']
         const suitColors = {'♠': 'black', '♥': 'red', '♦': 'red', '♣': 'black'}
@@ -414,6 +468,36 @@
             })
         }
 
+        function renderDealerCards(hideSecond = false) {
+            let dealerArea = document.getElementById('dealer-cards')
+            dealerArea.innerHTML = ''
+            
+            dealerCards.forEach((card, index) => {
+                let cardDiv = document.createElement('div')
+                
+                if (hideSecond && index === 1) {
+                    // Hide second card
+                    cardDiv.className = 'card card-back'
+                    cardDiv.innerHTML = '🂠'
+                } else {
+                    cardDiv.className = 'card ' + suitColors[card.suit]
+                    cardDiv.innerHTML = `
+                        <div class="card-top">${card.display}<br>${card.suit}</div>
+                        <div class="card-middle">${card.suit}</div>
+                        <div class="card-bottom">${card.display}<br>${card.suit}</div>
+                    `
+                }
+                dealerArea.appendChild(cardDiv)
+            })
+
+            // Update dealer sum display
+            if (hideSecond) {
+                document.getElementById('dealer-sum').textContent = 'Sum: ?'
+            } else {
+                document.getElementById('dealer-sum').textContent = 'Sum: ' + dealerSum
+            }
+        }
+
         function placeBet(amount) {
             if (gameInProgress) {
                 document.getElementById('message').textContent = "Finish the current game first!"
@@ -450,12 +534,21 @@
             hasBlackJack = false
             gameInProgress = true
             
+            // Deal player cards
             let firstCard = getRandomCard()
             let secondCard = getRandomCard()
             cards = [firstCard, secondCard]
             sum = firstCard.value + secondCard.value
 
+            // Deal dealer cards
+            let dealerFirst = getRandomCard()
+            let dealerSecond = getRandomCard()
+            dealerCards = [dealerFirst, dealerSecond]
+            dealerSum = dealerFirst.value + dealerSecond.value
+            dealerHiddenCard = dealerSecond
+
             renderGame()
+            renderDealerCards(true) // Hide dealer's second card
         }
 
         function renderGame() {
@@ -467,11 +560,12 @@
             } else if (sum === 21) {
                 document.getElementById('message').textContent = "🎉 BLACKJACK! 🎉"
                 hasBlackJack = true
-                gameOver(true)
+                dealerPlay()
             } else {
                 document.getElementById('message').textContent = "BUST! You lose $" + bet
                 isAlive = false
-                gameOver(false)
+                renderDealerCards(false) // Reveal dealer's cards
+                setTimeout(() => gameOver(false), 1500)
             }
         }
 
@@ -486,13 +580,58 @@
 
         function stand() {
             if (gameInProgress && isAlive && !hasBlackJack) {
-                if (sum >= 17) {
-                    document.getElementById('message').textContent = "You stood on " + sum + ". You win $" + (bet * 2) + "!"
-                    gameOver(true)
+                // Player stands, dealer plays
+                dealerPlay()
+            }
+        }
+
+        function dealerPlay() {
+            // Reveal dealer's hidden card
+            renderDealerCards(false)
+            
+            document.getElementById('message').textContent = "Dealer is playing..."
+            
+            // Dealer AI: Must hit on 16 or less, must stand on 17 or more
+            let dealerPlayInterval = setInterval(() => {
+                if (dealerSum < 17) {
+                    let newCard = getRandomCard()
+                    dealerCards.push(newCard)
+                    dealerSum += newCard.value
+                    renderDealerCards(false)
                 } else {
-                    document.getElementById('message').textContent = "You stood on " + sum + ". Too low! You lose."
-                    gameOver(false)
+                    clearInterval(dealerPlayInterval)
+                    determineWinner()
                 }
+            }, 1000)
+        }
+
+        function determineWinner() {
+            let message = ""
+            let won = false
+
+            if (dealerSum > 21) {
+                message = "Dealer BUSTS! You win $" + (bet * 2) + "! 🎉"
+                won = true
+            } else if (sum > dealerSum) {
+                message = "You win with " + sum + "! You win $" + (bet * 2) + "! 🎉"
+                won = true
+            } else if (sum === dealerSum) {
+                message = "PUSH! It's a tie. Bet returned."
+                player.chips += bet // Return the bet
+                updateDisplay()
+            } else {
+                message = "Dealer wins with " + dealerSum + ". You lose $" + bet + "."
+                won = false
+            }
+
+            document.getElementById('message').textContent = message
+            
+            if (won) {
+                gameOver(true)
+            } else if (sum !== dealerSum) {
+                gameOver(false)
+            } else {
+                gameInProgress = false
             }
         }
 
@@ -500,7 +639,7 @@
             gameInProgress = false
             
             if (won) {
-                let winnings = bet * 10
+                let winnings = bet * 2
                 player.chips += winnings
                 console.log("You won $" + winnings)
             }
@@ -518,15 +657,20 @@
             }
             
             cards = []
+            dealerCards = []
             sum = 0
+            dealerSum = 0
             hasBlackJack = false
             isAlive = false
             bet = 0
             gameInProgress = false
+            dealerHiddenCard = null
             
-            document.getElementById('cards-area').innerHTML = '<div style="color: rgba(255,255,255,0.5); font-size: clamp(1em, 3vw, 1.2em);">Place your bet to start!</div>'
+            document.getElementById('cards-area').innerHTML = '<div style="color: rgba(255,255,255,0.5); font-size: clamp(0.9em, 2.5vw, 1.1em);">Place your bet to start!</div>'
+            document.getElementById('dealer-cards').innerHTML = '<div style="color: rgba(255,255,255,0.5); font-size: clamp(0.9em, 2.5vw, 1.1em);">Waiting...</div>'
             document.getElementById('message').textContent = "Place your bet to start a new round!"
             document.getElementById('sum-el').textContent = "Sum: 0"
+            document.getElementById('dealer-sum').textContent = "Sum: ?"
             updateDisplay()
         }
 
@@ -538,4 +682,3 @@
     </script>
 </body>
 </html>
-
